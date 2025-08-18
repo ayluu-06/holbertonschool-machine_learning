@@ -19,6 +19,5 @@ def scatter():
     plt.title("Men's Height vs Weight")
     plt.xlabel("Height (in)")
     plt.ylabel("Weight (lbs)")
-    plt.scatter(x, y, color='magenta', marker='.')
+    plt.scatter(x, y, color='magenta')
     plt.show()
-    plt.close()
