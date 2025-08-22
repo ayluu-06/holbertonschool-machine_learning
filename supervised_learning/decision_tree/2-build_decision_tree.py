@@ -62,9 +62,9 @@ class Node:
         """
         función documentada
         """
-        header = (f"root [feature={self.feature}, threshold ={self.threshold}]"
+        header = (f"root [feature={self.feature}, threshold={self.threshold}]"
                   if self.is_root
-                  else f"-> node[feature={self.feature}, "
+                  else f"-> node [feature={self.feature}, "
                   f"threshold={self.threshold}]")
 
         left_text = (self.left_child.__str__()
@@ -158,10 +158,11 @@ def left_child_add_prefix(text):
     función documentada
     """
     lines = text.split("\n")
-    new_text = "    +--"+lines[0] + "\n"
+    new_text = "    +--" + lines[0] + "\n"
     for x in lines[1:]:
-        new_text += ("    |  "+x)+"\n"
-    return (new_text)
+        if x.strip() != "":
+            new_text += "    |  " + x + "\n"
+    return new_text
 
 
 def right_child_add_prefix(text):
@@ -171,5 +172,6 @@ def right_child_add_prefix(text):
     lines = text.split("\n")
     new_text = "    +--" + lines[0] + "\n"
     for x in lines[1:]:
-        new_text += ("       " + x) + "\n"
+        if x.strip() != "":
+            new_text += "       " + x + "\n"
     return new_text
