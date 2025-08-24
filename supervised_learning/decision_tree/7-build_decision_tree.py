@@ -280,8 +280,10 @@ class Decision_Tree():
         """
         return np.min(arr), np.max(arr)
 
-
     def random_split_criterion(self, node):
+        """
+        funcion documentada
+        """
         diff = 0.0
         while diff == 0.0:
             feature = self.rng.integers(0, self.explanatory.shape[1])
@@ -292,12 +294,17 @@ class Decision_Tree():
         threshold = (1 - x) * fmin + x * fmax
         return feature, threshold
 
-
     def fit(self, explanatory, target, verbose=0):
+        """
+        funcion documentada
+        """
         if self.split_criterion == "random":
             self.split_criterion = self.random_split_criterion
         else:
             def _notimpl(node):
+                """
+                funcion documentada
+                """
                 raise NotImplementedError(
                     "Gini_split_criterion aún no implementado"
                     )
@@ -323,8 +330,10 @@ class Decision_Tree():
         self.target
         ) }""")
 
-
     def fit_node(self, node):
+        """
+        funcion documentada
+        """
         node.feature, node.threshold = self.split_criterion(node)
 
         go_left = self.explanatory[:, node.feature] > node.threshold
@@ -336,6 +345,9 @@ class Decision_Tree():
         next_depth = node.depth + 1
 
         def is_pure(pop):
+            """
+            funcion documentada
+            """
             vals = self.target[pop]
             if vals.size == 0:
                 return True
@@ -365,24 +377,31 @@ class Decision_Tree():
             node.right_child = self.get_node_child(node, right_population)
             self.fit_node(node.right_child)
 
-
     def get_leaf_child(self, node, sub_population):
-        vals, counts = np.unique(self.target[sub_population], return_counts=True)
+        """
+        funcion documentada
+        """
+        vals, counts = np.unique(
+            self.target[sub_population], return_counts=True)
         value = int(vals[np.argmax(counts)]) if vals.size > 0 else 0
         leaf_child = Leaf(value)
         leaf_child.depth = node.depth + 1
         leaf_child.sub_population = sub_population
         return leaf_child
 
-
     def get_node_child(self, node, sub_population):
+        """
+        funcion documentada
+        """
         n = Node()
         n.depth = node.depth + 1
         n.sub_population = sub_population
         return n
 
-
     def accuracy(self, test_explanatory, test_target):
+        """
+        funcion documentada
+        """
         return np.sum(
             self.predict(test_explanatory) == test_target) / test_target.size
 
