@@ -441,7 +441,9 @@ class Decision_Tree():
             p_right = np.where(
                 n_right[:, None] > 0, R_counts / n_right[:, None], 0.0)
         gini_right = 1.0 - np.sum(p_right * p_right, axis=1)
-        gini_avg = 0.5 * (gini_left + gini_right)
+        gini_avg = (
+            n_left * gini_left + n_right * gini_right
+            ) / (n_left + n_right)
         j = np.argmin(gini_avg)
         return np.array([th[j], gini_avg[j]], dtype=float)
 
