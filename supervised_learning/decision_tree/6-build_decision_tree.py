@@ -258,6 +258,9 @@ class Decision_Tree():
         self.root.update_bounds_below()
 
     def update_predict(self):
+        """
+        funcion documentada
+        """
         self.update_bounds()
         leaves = self.get_leaves()
         for leaf in leaves:
