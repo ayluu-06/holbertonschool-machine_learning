@@ -85,4 +85,4 @@ class NeuralNetwork:
         A2 = 1.0 / (1.0 + np.exp(-Z2))
         self.__A2 = A2
 
-        return self.__A1 self.__A2
+        return self.__A1, self.__A2
