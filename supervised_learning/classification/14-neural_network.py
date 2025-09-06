@@ -114,7 +114,7 @@ class NeuralNetwork:
 
         dZ2 = A2 - Y
         dW2 = (dZ2 @ A1.T) / m
-        db2 = np.sum(dZ2) / m
+        db2 = np.sum(dZ2, axis=1, keepdims=True) / m
 
         dZ1 = (self.__W2.T @ dZ2) * (A1 * (1 - A1))
         dW1 = (dZ1 @ X.T) / m
