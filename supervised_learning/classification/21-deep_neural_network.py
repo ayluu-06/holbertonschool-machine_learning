@@ -109,8 +109,8 @@ class DeepNeuralNetwork:
             db = np.sum(dZ, axis=1, keepdims=True) / m
 
             self.__weights[f"W{layer}"] = Wl - alpha * dW
-            self.__weights[f"b{layer}"] = self.__weights[f"b{
-                layer}"] - alpha * db
+            self.__weights[f"b{layer}"] = (
+                self.__weights[f"b{layer}"] - alpha * db)
 
             if layer > 1:
                 A_prev_act = A_prev
