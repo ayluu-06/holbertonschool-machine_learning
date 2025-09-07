@@ -88,8 +88,7 @@ class DeepNeuralNetwork:
         """
         m = Y.shape[1]
         eps = 1e-8
-        cost = -(1 / m) * np.sum(Y * np.log(A + eps))
-        return cost
+        return -(1 / m) * np.sum(Y * np.log(A))
 
     def evaluate(self, X, Y):
         """
