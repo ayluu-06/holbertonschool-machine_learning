@@ -118,7 +118,8 @@ class DeepNeuralNetwork:
                 A_prev_act = A_prev
                 dZ = (Wl.T @ dZ) * (A_prev_act * (1 - A_prev_act))
 
-    def train(self, X, Y, iterations=5000, alpha=0.05, graph=False, step=100):
+    def train(self, X, Y, iterations=5000, alpha=0.05,
+              verbose=False, graph=False, step=100):
         """
         funcion documentada
         """
@@ -133,9 +134,11 @@ class DeepNeuralNetwork:
 
         for i in range(iterations + 1):
             AL, cache = self.forward_prop(X)
-            if graph and (i % step == 0 or i == iterations):
+
+            if verbose and (i % step == 0 or i == iterations):
                 cost = self.cost(Y, AL)
                 print(f"Cost after {i} iterations: {cost}")
+
             if i < iterations:
                 self.gradient_descent(Y, cache, alpha)
 
