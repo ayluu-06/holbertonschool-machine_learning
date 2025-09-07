@@ -143,19 +143,19 @@ class DeepNeuralNetwork:
 
     def save(self, filename):
         """
-        funcion doucumentada
+        funcion documentada
         """
-        if not filename.endswith('.pkl'):
-            filename += '.pkl'
-        with open(filename, 'wb') as f:
+        if not filename.endswith(".pkl"):
+            filename += ".pkl"
+        with open(filename, "wb") as f:
             pickle.dump(self, f)
 
     @staticmethod
     def load(filename):
         """
-        funcion doucumentada
+        funcion documentada
         """
         if not os.path.exists(filename):
             return None
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             return pickle.load(f)
