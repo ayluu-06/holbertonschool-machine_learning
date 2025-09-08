@@ -2,7 +2,6 @@
 """
 modelo documentado
 """
-
 import tensorflow.keras as K
 
 
@@ -14,22 +13,22 @@ def train_model(network, data, labels, batch_size, epochs,
     funcion documentada
     """
     callbacks = []
+
     if early_stopping and validation_data is not None:
         callbacks.append(K.callbacks.EarlyStopping(
             monitor='val_loss',
             patience=patience,
             restore_best_weights=True
         ))
+
     if learning_rate_decay and validation_data is not None:
         def schedule(epoch):
-            lr = alpha / (1 + decay_rate * epoch)
-            print(
-                "\nEpoch {}: LearningRateScheduler setting learning rate to "
-                "{}.".format(epoch + 1, lr)
-            )
-            return lr
-        callbacks.append(
-            K.callbacks.LearningRateScheduler(schedule, verbose=1))
+            return alpha / (1 + decay_rate * epoch)
+
+        callbacks.append(K.callbacks.LearningRateScheduler(
+            schedule, verbose=1
+        ))
+
     history = network.fit(
         data,
         labels,
