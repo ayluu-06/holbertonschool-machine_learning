@@ -2,7 +2,7 @@
 """
 Modulo documentado
 """
-import tensorflow as tf
+import numpy as np
 
 
 def update_variables_RMSProp(alpha, beta2, epsilon, var, grad, s):
