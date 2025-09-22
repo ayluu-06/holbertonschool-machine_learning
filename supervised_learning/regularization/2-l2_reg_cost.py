@@ -9,5 +9,5 @@ def l2_reg_cost(cost, model):
     """
     funcion documentada
     """
-    reg_losses = tf.add_n(model.losses)
+    reg_losses = tf.stack(model.losses)
     return cost + reg_losses
