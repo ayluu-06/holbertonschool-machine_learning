@@ -13,7 +13,7 @@ def create_confusion_matrix(labels, logits):
     y_true_idx = np.argmax(labels, axis=1)
     y_pred_idx = np.argmax(logits, axis=1)
 
-    confusion = np.zeros((classes, classes), dtype=int)
+    confusion = np.zeros((classes, classes), dtype=float)
 
     for k in range(m):
         i = y_true_idx[k]
