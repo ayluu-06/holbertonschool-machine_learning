@@ -17,9 +17,9 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     if isinstance(padding, tuple):
         ph, pw = padding
         pad_top = ph
-        pad_bottom = ph
+        pad_bottom = 0
         pad_left = pw
-        pad_right = pw
+        pad_right = 0
     elif padding == 'valid':
         pad_top = 0
         pad_bottom = 0
@@ -49,15 +49,13 @@ def convolve_grayscale(images, kernel, padding='same', stride=(1, 1)):
     out_h = (H - kh) // sh + 1
     out_w = (W - kw) // sw + 1
 
-    output = np.zeros((m, out_h, out_w))
+    out = np.zeros((m, out_h, out_w))
 
     for i in range(out_h):
         for j in range(out_w):
             vs = i * sh
-            ve = vs + kh
             hs = j * sw
-            he = hs + kw
-            window = padded[:, vs:ve, hs:he]
-            output[:, i, j] = np.sum(window * kernel, axis=(1, 2))
+            window = padded[:, vs:vs + kh, hs:hs + kw]
+            out[:, i, j] = np.sum(window * kernel, axis=(1, 2))
 
-    return output
+    return out
