@@ -273,6 +273,106 @@ class Decision_Tree():
         funcion documentada
         """
         return self.root.pred(x)
+    
+    def np_extrema(self, arr):
+        """
+        funcion documentada
+        """
+        return np.min(arr), np.max(arr)
+
+def random_split_criterion(self, node):
+    diff = 0.0
+    while diff == 0.0:
+        feature = self.rng.integers(0, self.explanatory.shape[1])
+        col = self.explanatory[:, feature][node.sub_population]
+        fmin, fmax = self.np_extrema(col)
+        diff = fmax - fmin
+    x = self.rng.uniform()
+    threshold = (1 - x) * fmin + x * fmax
+    return feature, threshold
+
+def fit(self, explanatory, target, verbose=0):
+    if self.split_criterion == "random":
+        self.split_criterion = self.random_split_criterion
+    else:
+        def _notimpl(node):
+            raise NotImplementedError("Gini_split_criterion aún no implementado")
+        self.Gini_split_criterion = _notimpl
+        self.split_criterion = self.Gini_split_criterion
+
+    self.explanatory = explanatory
+    self.target = target
+
+    self.root.sub_population = np.ones_like(self.target, dtype=bool)
+
+    self.fit_node(self.root)
+
+    self.update_predict()
+
+    if verbose == 1:
+        print(f"""  Training finished.
+- Depth                     : { self.depth() }
+- Number of nodes           : { self.count_nodes() }
+- Number of leaves          : { self.count_nodes(only_leaves=True) }
+- Accuracy on training data : { self.accuracy(self.explanatory, self.target) }""")
+
+def fit_node(self, node):
+    node.feature, node.threshold = self.split_criterion(node)
+
+    go_left = self.explanatory[:, node.feature] > node.threshold
+    left_population = np.logical_and(go_left, node.sub_population)
+    right_population = np.logical_and(~go_left, node.sub_population)
+
+    left_count = np.sum(left_population)
+    right_count = np.sum(right_population)
+    next_depth = node.depth + 1
+
+    def is_pure(pop):
+        vals = self.target[pop]
+        if vals.size == 0:
+            return True
+        return np.unique(vals).size == 1
+
+    is_left_leaf = (
+        left_count < self.min_pop
+        or next_depth >= self.max_depth
+        or is_pure(left_population)
+    )
+
+    if is_left_leaf:
+        node.left_child = self.get_leaf_child(node, left_population)
+    else:
+        node.left_child = self.get_node_child(node, left_population)
+        self.fit_node(node.left_child)
+
+    is_right_leaf = (
+        right_count < self.min_pop
+        or next_depth >= self.max_depth
+        or is_pure(right_population)
+    )
+
+    if is_right_leaf:
+        node.right_child = self.get_leaf_child(node, right_population)
+    else:
+        node.right_child = self.get_node_child(node, right_population)
+        self.fit_node(node.right_child)
+
+def get_leaf_child(self, node, sub_population):
+    vals, counts = np.unique(self.target[sub_population], return_counts=True)
+    value = int(vals[np.argmax(counts)]) if vals.size > 0 else 0
+    leaf_child = Leaf(value)
+    leaf_child.depth = node.depth + 1
+    leaf_child.sub_population = sub_population
+    return leaf_child
+
+def get_node_child(self, node, sub_population):
+    n = Node()
+    n.depth = node.depth + 1
+    n.sub_population = sub_population
+    return n
+
+def accuracy(self, test_explanatory, test_target):
+    return np.sum(self.predict(test_explanatory) == test_target) / test_target.size
 
 
 def left_child_add_prefix(text):

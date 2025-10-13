@@ -300,16 +300,15 @@ class Decision_Tree():
         """
         if self.split_criterion == "random":
             self.split_criterion = self.random_split_criterion
+        elif self.split_criterion == "Gini":
+            self.split_criterion = self.Gini_split_criterion
         else:
             def _notimpl(node):
                 """
                 funcion documentada
                 """
-                raise NotImplementedError(
-                    "Gini_split_criterion aún no implementado"
-                    )
-            self.Gini_split_criterion = _notimpl
-            self.split_criterion = self.Gini_split_criterion
+                raise NotImplementedError("Criterio no implementado")
+            self.split_criterion = _notimpl
 
         self.explanatory = explanatory
         self.target = target
@@ -404,6 +403,56 @@ class Decision_Tree():
         """
         return np.sum(
             self.predict(test_explanatory) == test_target) / test_target.size
+
+    def possible_thresholds(self, node, feature):
+        """
+        funcion documentada
+        """
+        vals = np.unique(self.explanatory[:, feature][node.sub_population])
+        if vals.size <= 1:
+            return np.array([], dtype=float)
+        return (vals[1:] + vals[:-1]) / 2.0
+
+    def Gini_split_criterion_one_feature(self, node, feature):
+        """
+        funcion documentada
+        """
+        mask = node.sub_population
+        Xf = self.explanatory[:, feature][mask]
+        y = self.target[mask]
+        th = self.possible_thresholds(node, feature)
+        t = th.size
+        if t == 0:
+            return np.array([0.0, 1.0], dtype=float)
+        classes = np.unique(y)
+        class_match = (y[:, None] == classes[None, :])
+        left_cmp = (Xf[:, None] > th[None, :])
+        Left_F = class_match[:, None, :] & left_cmp[:, :, None]
+        L_counts = Left_F.sum(axis=0)
+        n_left = L_counts.sum(axis=1)
+        C_counts = class_match.sum(axis=0)
+        R_counts = C_counts[None, :] - L_counts
+        n_right = C_counts.sum() - n_left
+        with np.errstate(divide='ignore', invalid='ignore'):
+            p_left = np.where(n_left[:, None] > 0, L_counts / n_left[:, None], 0.0)
+        gini_left = 1.0 - np.sum(p_left * p_left, axis=1)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            p_right = np.where(n_right[:, None] > 0, R_counts / n_right[:, None], 0.0)
+        gini_right = 1.0 - np.sum(p_right * p_right, axis=1)
+        gini_avg = 0.5 * (gini_left + gini_right)
+        j = np.argmin(gini_avg)
+        return np.array([th[j], gini_avg[j]], dtype=float)
+
+    def Gini_split_criterion(self, node):
+        """
+        funcion documentada
+        """
+        X = np.array([
+            self.Gini_split_criterion_one_feature(node, i)
+            for i in range(self.explanatory.shape[1])
+        ])
+        i = np.argmin(X[:, 1])
+        return int(i), float(X[i, 0])
 
 
 def left_child_add_prefix(text):
