@@ -26,8 +26,13 @@ class Yolo:
         funcion docuemntada
         """
         image_h, image_w = image_size
-        in_h = int(self.model.input_shape[1])
-        in_w = int(self.model.input_shape[2])
+
+        in_h = self.model.input_shape[1]
+        in_w = self.model.input_shape[2]
+        if in_h is None or in_w is None:
+            in_h, in_w = 416, 416
+        else:
+            in_h, in_w = int(in_h), int(in_w)
 
         def sigmoid(x):
             return 1.0 / (1.0 + np.exp(-x))
@@ -81,9 +86,28 @@ class Yolo:
                 fb.append(b[mask])
                 fc.append(classes[mask])
                 fs.append(best_scores[mask])
+
         if len(fb) == 0:
-            return np.empty((0, 4)), np.empty((0,), dtype=int), np.empty((0,))
+            return (np.empty((0, 4)),
+                    np.empty((0,), dtype=int),
+                    np.empty((0,)))
+
         filtered_boxes = np.concatenate(fb, axis=0)
         box_classes = np.concatenate(fc, axis=0)
         box_scores = np.concatenate(fs, axis=0)
         return filtered_boxes, box_classes, box_scores
+
+    def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
+        """
+        funcion documentada
+        """
+        if filtered_boxes.size == 0:
+            return (np.empty((0, 4)),
+                    np.empty((0,), dtype=int),
+                    np.empty((0,)))
+
+        def iou(box, boxes):
+            """
+            funcion documentada
+            """
+            x1 = n
