@@ -48,20 +48,18 @@ class Yolo:
             cy = np.tile(np.arange(gh).reshape(gh, 1, 1), (1, gw, nb))
 
             anchors_i = self.anchors[i]
-            anchors_i = anchors_i.reshape(1, 1, nb, 2)
-            pw = anchors_i[..., 0]
-            ph = anchors_i[..., 1]
+            pw = anchors_i[:, 0].reshape((1, 1, nb))
+            ph = anchors_i[:, 1].reshape((1, 1, nb))
 
             bx = (sigmoid(t_xy[..., 0]) + cx) / gw
             by = (sigmoid(t_xy[..., 1]) + cy) / gh
-
             bw = (pw * np.exp(t_wh[..., 0])) / in_w
             bh = (ph * np.exp(t_wh[..., 1])) / in_h
 
-            x1 = (bx - bw / 2.0) * image_w
-            y1 = (by - bh / 2.0) * image_h
-            x2 = (bx + bw / 2.0) * image_w
-            y2 = (by + bh / 2.0) * image_h
+            x1 = (bx - bw / 2) * image_w
+            y1 = (by - bh / 2) * image_h
+            x2 = (bx + bw / 2) * image_w
+            y2 = (by + bh / 2) * image_h
 
             boxes.append(np.stack((x1, y1, x2, y2), axis=-1))
             box_confidences.append(sigmoid(t_obj))
