@@ -25,9 +25,9 @@ class Yolo:
         """
         funcion docuemntada
         """
-        image_h, image_w = image_size
-        in_h = int(self.model.input_shape[1])
-        in_w = int(self.model.input_shape[2])
+        img_h, img_w = image_size.astype(np.float32)
+        in_h = float(self.model.input_shape[1])
+        in_w = float(self.model.input_shape[2])
 
         def sigmoid(x):
             return 1.0 / (1.0 + np.exp(-x))
@@ -36,30 +36,35 @@ class Yolo:
         box_confidences = []
         box_class_probs = []
 
-        for i, output in enumerate(outputs):
-            gh, gw, nb, _ = output.shape
+        n_out = len(outputs)
 
-            t_xy = output[..., 0:2]
-            t_wh = output[..., 2:4]
-            t_obj = output[..., 4:5]
-            t_cls = output[..., 5:]
+        for i, out in enumerate(outputs):
+            gh, gw, nb, _ = out.shape
 
-            cx = np.tile(np.arange(gw).reshape(1, gw, 1), (gh, 1, nb))
-            cy = np.tile(np.arange(gh).reshape(gh, 1, 1), (1, gw, nb))
+            t_xy = out[..., 0:2].astype(np.float32)
+            t_wh = out[..., 2:4].astype(np.float32)
+            t_obj = out[..., 4:5].astype(np.float32)
+            t_cls = out[..., 5:].astype(np.float32)
 
-            anchors_i = self.anchors[i]
-            pw = anchors_i[:, 0].reshape((1, 1, nb))
-            ph = anchors_i[:, 1].reshape((1, 1, nb))
+            gy, gx = np.indices((gh, gw), dtype=np.float32)
+            gx = np.expand_dims(gx, axis=-1)
+            gy = np.expand_dims(gy, axis=-1)
 
-            bx = (sigmoid(t_xy[..., 0]) + cx) / gw
-            by = (sigmoid(t_xy[..., 1]) + cy) / gh
+            anchors_i = self.anchors[n_out - 1 - i].astype(np.float32)
+            anchors_i = anchors_i.reshape(1, 1, nb, 2)
+            pw = anchors_i[..., 0]
+            ph = anchors_i[..., 1]
+
+            bx = (sigmoid(t_xy[..., 0]) + gx) / float(gw)
+            by = (sigmoid(t_xy[..., 1]) + gy) / float(gh)
+
             bw = (pw * np.exp(t_wh[..., 0])) / in_w
             bh = (ph * np.exp(t_wh[..., 1])) / in_h
 
-            x1 = (bx - bw / 2) * image_w
-            y1 = (by - bh / 2) * image_h
-            x2 = (bx + bw / 2) * image_w
-            y2 = (by + bh / 2) * image_h
+            x1 = (bx - bw / 2.0) * img_w
+            y1 = (by - bh / 2.0) * img_h
+            x2 = (bx + bw / 2.0) * img_w
+            y2 = (by + bh / 2.0) * img_h
 
             boxes.append(np.stack((x1, y1, x2, y2), axis=-1))
             box_confidences.append(sigmoid(t_obj))
