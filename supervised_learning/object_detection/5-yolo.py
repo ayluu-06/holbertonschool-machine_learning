@@ -190,8 +190,10 @@ class Yolo:
         for i, img in enumerate(images):
             h, w = img.shape[:2]
             shapes[i] = (h, w)
+            img_f = img.astype(np.float32) / 255.0
             resized = cv2.resize(
-                img, (in_w, in_h), interpolation=cv2.INTER_CUBIC)
-            pimgs[i] = resized.astype(np.float32) / 255.0
+                img_f, (in_w, in_h), interpolation=cv2.INTER_CUBIC
+            )
+            pimgs[i] = resized
 
         return pimgs, shapes
