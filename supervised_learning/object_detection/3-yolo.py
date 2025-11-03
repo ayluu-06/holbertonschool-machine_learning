@@ -89,40 +89,33 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
-        """
-        funcion documentada
-        """
         if filtered_boxes.size == 0:
             return (np.empty((0, 4)),
                     np.empty((0,), dtype=int),
                     np.empty((0,)))
 
         def iou(box, boxes):
-            """
-            funcion documentada
-            """
             x1 = np.maximum(box[0], boxes[:, 0])
             y1 = np.maximum(box[1], boxes[:, 1])
             x2 = np.minimum(box[2], boxes[:, 2])
             y2 = np.minimum(box[3], boxes[:, 3])
-
             inter_w = np.maximum(0.0, x2 - x1)
             inter_h = np.maximum(0.0, y2 - y1)
             inter = inter_w * inter_h
-
-            area_box = (box[2] - box[0]) * (box[3] - box[1])
-            area_boxes = (boxes[:, 2] - boxes[:, 0]) * (
-                boxes[:, 3] - boxes[:, 1])
-
+            area_box = np.maximum(0.0, (
+                box[2] - box[0])) * np.maximum(0.0, (box[3] - box[1]))
+            area_boxes = (
+                np.maximum(0.0, (boxes[:, 2] - boxes[:, 0]))
+                * np.maximum(0.0, (boxes[:, 3] - boxes[:, 1]))
+            )
             union = area_box + area_boxes - inter + 1e-16
             return inter / union
 
-        keep_boxes = []
-        keep_classes = []
-        keep_scores = []
+        kept_boxes = []
+        kept_classes = []
+        kept_scores = []
 
-        unique_classes = np.unique(box_classes)
-        for c in unique_classes:
+        for c in np.unique(box_classes):
             idxs = np.where(box_classes == c)[0]
             b = filtered_boxes[idxs]
             s = box_scores[idxs]
@@ -130,40 +123,25 @@ class Yolo:
             order = np.argsort(-s)
             b = b[order]
             s = s[order]
-            idxs_ord = idxs[order]
 
-            selected = []
-            while len(b) > 0:
-                selected.append(0)
-                if len(b) == 1:
+            keep = []
+            while order.size > 0:
+                keep.append(order[0])
+                if order.size == 1:
                     break
                 ious = iou(b[0], b[1:])
-                keep = np.where(ious <= self.nms_t)[0] + 1
-                b = b[keep]
-                s = s[keep]
-                idxs_ord = idxs_ord[keep]
+                remain = np.where(ious <= self.nms_t)[0] + 1
+                b = b[remain]
+                s = s[remain]
+                order = order[remain]
 
-            keep_idx = (np.array(idxs)[np.argsort(-s)]
-                        if len(selected) == 0 else np.array(idxs)[0:0])
+            kept_boxes.append(filtered_boxes[idxs][keep])
+            kept_scores.append(box_scores[idxs][keep])
+            kept_classes.append(np.full(len(keep), c, dtype=int))
 
-            sel_mask = np.zeros(len(order), dtype=bool)
-            sel_mask[np.array(selected)] = True
-
-            b = filtered_boxes[idxs][order][sel_mask]
-            s = box_scores[idxs][order][sel_mask]
-
-            keep_boxes.append(b)
-            keep_scores.append(s)
-            keep_classes.append(np.full(b.shape[0], c, dtype=int))
-
-        if len(keep_boxes) == 0:
-            return (np.empty((0, 4)),
-                    np.empty((0,), dtype=int),
-                    np.empty((0,)))
-
-        box_predictions = np.concatenate(keep_boxes, axis=0)
-        predicted_box_classes = np.concatenate(keep_classes, axis=0)
-        predicted_box_scores = np.concatenate(keep_scores, axis=0)
+        box_predictions = np.concatenate(kept_boxes, axis=0)
+        predicted_box_classes = np.concatenate(kept_classes, axis=0)
+        predicted_box_scores = np.concatenate(kept_scores, axis=0)
 
         order = np.lexsort((-predicted_box_scores, predicted_box_classes))
         box_predictions = box_predictions[order]
