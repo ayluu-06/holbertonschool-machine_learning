@@ -27,7 +27,12 @@ class Yolo:
         """
         image_h, image_w = image_size
 
-        in_h, in_w = 416, 416
+        in_h = self.model.input_shape[1]
+        in_w = self.model.input_shape[2]
+        if in_h is None or in_w is None:
+            in_h, in_w = 416, 416
+        else:
+            in_h, in_w = int(in_h), int(in_w)
 
         def sigmoid(x):
             return 1.0 / (1.0 + np.exp(-x))
@@ -47,7 +52,7 @@ class Yolo:
             cx = np.tile(np.arange(gw).reshape(1, gw, 1), (gh, 1, nb))
             cy = np.tile(np.arange(gh).reshape(gh, 1, 1), (1, gw, nb))
 
-            anchors_i = self.anchors[i].astype(np.float32)
+            anchors_i = self.anchors[i]
             pw = anchors_i[:, 0].reshape((1, 1, nb))
             ph = anchors_i[:, 1].reshape((1, 1, nb))
 
@@ -105,63 +110,4 @@ class Yolo:
             """
             funcion documentada
             """
-            x1 = np.maximum(box[0], boxes[:, 0])
-            y1 = np.maximum(box[1], boxes[:, 1])
-            x2 = np.minimum(box[2], boxes[:, 2])
-            y2 = np.minimum(box[3], boxes[:, 3])
-
-            inter_w = np.maximum(0.0, x2 - x1)
-            inter_h = np.maximum(0.0, y2 - y1)
-            inter = inter_w * inter_h
-
-            area_box = np.maximum(0.0, (box[2] - box[0])) * np.maximum(0.0, (box[3] - box[1]))
-            area_boxes = (
-                np.maximum(0.0, (boxes[:, 2] - boxes[:, 0])) *
-                np.maximum(0.0, (boxes[:, 3] - boxes[:, 1]))
-            )
-            union = area_box + area_boxes - inter + 1e-16
-            return inter / union
-
-        kept_boxes = []
-        kept_classes = []
-        kept_scores = []
-
-        for c in np.unique(box_classes):
-            idxs = np.where(box_classes == c)[0]
-            b = filtered_boxes[idxs]
-            s = box_scores[idxs]
-
-            order = np.argsort(-s)
-            b = b[order]
-            s = s[order]
-
-            keep = []
-            while order.size > 0:
-                keep.append(order[0])
-                if order.size == 1:
-                    break
-                ious = iou(b[0], b[1:])
-                remain = np.where(ious <= self.nms_t)[0] + 1
-                b = b[remain]
-                s = s[remain]
-                order = order[remain]
-
-            kept_boxes.append(filtered_boxes[idxs][keep])
-            kept_scores.append(box_scores[idxs][keep])
-            kept_classes.append(np.full(len(keep), c, dtype=int))
-
-        if len(kept_boxes) == 0:
-            return (np.empty((0, 4)),
-                    np.empty((0,), dtype=int),
-                    np.empty((0,)))
-
-        box_predictions = np.concatenate(kept_boxes, axis=0)
-        predicted_box_classes = np.concatenate(kept_classes, axis=0)
-        predicted_box_scores = np.concatenate(kept_scores, axis=0)
-
-        order = np.lexsort((-predicted_box_scores, predicted_box_classes))
-        box_predictions = box_predictions[order]
-        predicted_box_classes = predicted_box_classes[order]
-        predicted_box_scores = predicted_box_scores[order]
-
-        return box_predictions, predicted_box_classes, predicted_box_scores
+            x1 = n
