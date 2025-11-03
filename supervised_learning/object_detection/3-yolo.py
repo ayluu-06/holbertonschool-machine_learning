@@ -89,12 +89,18 @@ class Yolo:
         return filtered_boxes, box_classes, box_scores
 
     def non_max_suppression(self, filtered_boxes, box_classes, box_scores):
+        """
+            funcion documentada
+        """
         if filtered_boxes.size == 0:
             return (np.empty((0, 4)),
                     np.empty((0,), dtype=int),
                     np.empty((0,)))
 
         def iou(box, boxes):
+            """
+            funcion documentada
+            """
             x1 = np.maximum(box[0], boxes[:, 0])
             y1 = np.maximum(box[1], boxes[:, 1])
             x2 = np.minimum(box[2], boxes[:, 2])
