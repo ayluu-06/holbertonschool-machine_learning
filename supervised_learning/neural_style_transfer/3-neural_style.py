@@ -45,6 +45,7 @@ class NST:
         self.beta = beta
         self.model = None
 
+        self.style_features = None
         self.gram_style_features = None
         self.content_feature = None
 
@@ -155,7 +156,8 @@ class NST:
         style_feats = style_outputs[:-1]
         content_feat = content_outputs[-1]
 
-        gram_list = [self.gram_matrix(feat) for feat in style_feats]
-
-        self.gram_style_features = gram_list
+        self.style_features = style_feats
+        self.gram_style_features = [
+            self.gram_matrix(feat) for feat in style_feats
+        ]
         self.content_feature = content_feat
