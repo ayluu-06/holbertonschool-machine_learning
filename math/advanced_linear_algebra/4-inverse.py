@@ -1,0 +1,70 @@
+#!/usr/bin/env python3
+"""
+Module documented
+"""
+
+
+def inverse(matrix):
+    """
+    funcion documentada
+    """
+    if not isinstance(matrix, list) or (
+        matrix != [] and not all(isinstance(r, list) for r in matrix)
+    ):
+        raise TypeError("matrix must be a list of lists")
+
+    if matrix == [] or any(len(r) != len(matrix) for r in matrix):
+        raise ValueError("matrix must be a non-empty square matrix")
+
+    if matrix == [[]]:
+        raise ValueError("matrix must be a non-empty square matrix")
+
+    n = len(matrix)
+
+    if n == 1:
+        return [[1 / matrix[0][0]]]
+
+    def determinant(m):
+        """
+        funcion documentada
+        """
+        if m == [[]]:
+            return 1
+        if any(len(r) != len(m) for r in m):
+            raise ValueError("matrix must be a square matrix")
+        size = len(m)
+        if size == 1:
+            return m[0][0]
+        if size == 2:
+            return m[0][0] * m[1][1] - m[0][1] * m[1][0]
+        det = 0
+        for j in range(size):
+            sub = [row[:j] + row[j+1:] for row in m[1:]]
+            det += ((-1) ** j) * m[0][j] * determinant(sub)
+        return det
+
+    det = determinant(matrix)
+    if det == 0:
+        return None
+
+    cof = []
+    for i in range(n):
+        row = []
+        for j in range(n):
+            sub = [
+                matrix[x][:j] + matrix[x][j+1:]
+                for x in range(n) if x != i
+            ]
+            sign = (-1) ** (i + j)
+            row.append(sign * determinant(sub))
+        cof.append(row)
+
+    adj = []
+    for j in range(n):
+        adj.append([cof[i][j] for i in range(n)])
+
+    inv = []
+    for i in range(n):
+        inv.append([adj[i][j] / det for j in range(n)])
+
+    return inv
