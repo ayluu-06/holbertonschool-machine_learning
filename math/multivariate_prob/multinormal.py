@@ -27,3 +27,23 @@ class MultiNormal:
         X = data - mean
         cov = (X @ X.T) / (n - 1)
         self.cov = cov
+
+    def pdf(self, x):
+        """
+        funcion documentada
+        """
+        if not isinstance(x, np.ndarray):
+            raise TypeError("x must be a numpy.ndarray")
+
+        d = self.mean.shape[0]
+        if x.shape != (d, 1):
+            raise ValueError("x must have the shape ({}, 1)".format(d))
+
+        diff = x - self.mean
+        det = np.linalg.det(self.cov)
+        inv = np.linalg.inv(self.cov)
+
+        norm_const = np.sqrt(((2 * np.pi) ** d) * det)
+        exponent = -0.5 * (diff.T @ inv @ diff)
+
+        return float(np.exp(exponent) / norm_const)
