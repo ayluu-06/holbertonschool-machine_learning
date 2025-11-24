@@ -46,4 +46,4 @@ class MultiNormal:
         norm_const = np.sqrt(((2 * np.pi) ** d) * det)
         exponent = -0.5 * (diff.T @ inv @ diff)
 
-        return np.exp(exponent) / norm_const
+        return (np.exp(exponent) / norm_const).item()
