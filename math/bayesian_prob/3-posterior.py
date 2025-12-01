@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import numpy as np
 """
 Modulo documentado
 """
+import numpy as np
 
 
 def posterior(x, n, P, Pr):

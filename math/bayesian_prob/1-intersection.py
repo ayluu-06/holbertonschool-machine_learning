@@ -3,6 +3,7 @@ import numpy as np
 """
 Modulo documentado
 """
+import numpy as np
 
 
 def intersection(x, n, P, Pr):
