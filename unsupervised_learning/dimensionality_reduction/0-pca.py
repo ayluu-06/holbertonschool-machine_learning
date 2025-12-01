@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Modulo documentado
+modulo documentado
 """
 
 import numpy as np
@@ -10,18 +10,13 @@ def pca(X, var=0.95):
     """
     funcion documentada
     """
-    cov = np.matmul(X.T, X) / (X.shape[0] - 1)
+    U, S, Vt = np.linalg.svd(X)
+    lambdas = S**2
+    total = np.sum(lambdas)
+    variance_ratio = np.cumsum(lambdas) / total
 
-    eig_vals, eig_vecs = np.linalg.eig(cov)
+    nd = np.searchsorted(variance_ratio, var) + 1
 
-    idx = np.argsort(eig_vals)[::-1]
-    eig_vals = eig_vals[idx]
-    eig_vecs = eig_vecs[:, idx]
+    W = Vt[:nd].T
 
-    total = np.sum(eig_vals)
-
-    cum_var = np.cumsum(eig_vals) / total
-    nd = np.searchsorted(cum_var, var) + 1
-
-    W = eig_vecs[:, :nd]
     return W
