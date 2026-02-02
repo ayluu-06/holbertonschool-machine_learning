@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-2-word2vec module
+2-word2vec
 """
 
 import gensim
@@ -11,16 +11,17 @@ def word2vec_model(sentences, vector_size=100, min_count=5, window=5,
     """
     funcion documentada
     """
+    sg = 0 if cbow else 1
+
     model = gensim.models.Word2Vec(
+        sentences=sentences,
         vector_size=vector_size,
         min_count=min_count,
         window=window,
         negative=negative,
-        sg=0 if cbow else 1,
+        sg=sg,
         seed=seed,
-        workers=workers
+        workers=workers,
+        epochs=epochs
     )
-
-    model.build_vocab(sentences)
-    model.train(sentences, total_examples=model.corpus_count, epochs=epochs)
     return model
