@@ -13,7 +13,9 @@ def bag_of_words(sentences, vocab=None):
     """
     tokenized = []
     for sentence in sentences:
-        words = re.findall(r"[a-z']+", sentence.lower())
+        s = sentence.lower()
+        s = re.sub(r"'s\b", "", s)
+        words = re.findall(r"[a-z]+", s)
         tokenized.append(words)
 
     if vocab is None:
@@ -22,9 +24,7 @@ def bag_of_words(sentences, vocab=None):
         vocab = list(vocab)
 
     features = np.array(vocab)
-
     word_to_index = {word: i for i, word in enumerate(features)}
-
     embeddings = np.zeros((len(sentences), len(features)), dtype=int)
 
     for i, sent in enumerate(tokenized):
