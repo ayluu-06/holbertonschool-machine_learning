@@ -13,7 +13,9 @@ def tf_idf(sentences, vocab=None):
     """
     tokenized = []
     for sentence in sentences:
-        words = re.findall(r"[a-z']+", sentence.lower())
+        s = sentence.lower()
+        s = re.sub(r"'s\b", "", s)
+        words = re.findall(r"[a-z]+", s)
         tokenized.append(words)
 
     if vocab is None:
