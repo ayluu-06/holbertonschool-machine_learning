@@ -5,7 +5,7 @@ modulo documentado
 """
 
 import tensorflow_datasets as tfds
-from transformers import BertTokenizerFast
+import transformers
 
 
 class Dataset:
@@ -29,10 +29,11 @@ class Dataset:
 
     def tokenize_dataset(self, data):
         """funcion documentada"""
-        base_pt = BertTokenizerFast.from_pretrained(
+        base_pt = transformers.BertTokenizerFast.from_pretrained(
             'neuralmind/bert-base-portuguese-cased'
         )
-        base_en = BertTokenizerFast.from_pretrained('bert-base-uncased')
+        base_en = transformers.BertTokenizerFast.from_pretrained(
+            'bert-base-uncased')
 
         def pt_iterator():
             for pt, _ in data:
