@@ -2,22 +2,27 @@
 """
 modulo documentado
 """
-import gymnasium as gym
+import numpy as np
 
 
-def load_frozen_lake(desc=None, map_name=None, is_slippery=False):
+def play(env, Q, max_steps=100):
     """
     funcion documentada
     """
-    if desc is None and map_name is None:
-        map_name = "8x8"
+    rendered_outputs = []
+    total_rewards = 0
 
-    env = gym.make(
-        "FrozenLake-v1",
-        desc=desc,
-        map_name=map_name,
-        is_slippery=is_slippery,
-        render_mode="ansi"
-    )
+    state, _ = env.reset()
+    rendered_outputs.append(env.render())
 
-    return env
+    for _ in range(max_steps):
+        action = np.argmax(Q[state])
+        state, reward, terminated, truncated, _ = env.step(action)
+
+        total_rewards += reward
+        rendered_outputs.append(env.render())
+
+        if terminated or truncated:
+            break
+
+    return total_rewards, rendered_outputs
