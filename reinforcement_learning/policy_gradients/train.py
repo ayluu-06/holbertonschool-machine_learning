@@ -41,6 +41,6 @@ def train(env, nb_episodes, alpha=0.000045, gamma=0.98, show_result=False):
             discount = 0
             for j, reward in enumerate(rewards[i:]):
                 discount += reward * (gamma ** j)
-            weights -= alpha * grad * discount
+            weights += alpha * grad * discount
 
     return scores
