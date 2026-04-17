@@ -2,6 +2,7 @@
 """
 modulo documentado
 """
+import pandas as pd
 
 index = __import__('10-index').index
 
