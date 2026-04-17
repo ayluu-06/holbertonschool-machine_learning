@@ -2,7 +2,6 @@
 """
 modulo documentado
 """
-import pandas as pd
 
 
 def index(df):
